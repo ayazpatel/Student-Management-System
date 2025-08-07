@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth/")
 public class AuthController {
@@ -24,16 +26,25 @@ public class AuthController {
         }
         Auth auth1 = authService.register(auth);
         if (auth1.getUsername().equals(auth.getUsername())) {
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity<>(auth1,HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Auth> loginUser(@RequestBody Auth auth) {
+    public ResponseEntity<?> loginUser(@RequestBody Auth auth) {
         if(auth == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        try {
+            String token = authService.verify(auth);
+            if (!"failed".equals(token)) {
+                return new ResponseEntity<>(Map.of("token", token), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 }

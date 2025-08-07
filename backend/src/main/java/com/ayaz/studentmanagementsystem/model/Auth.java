@@ -2,19 +2,24 @@ package com.ayaz.studentmanagementsystem.model;
 
 import jakarta.persistence.*;
 
+import com.ayaz.studentmanagementsystem.model.enums.Role;
+
 @Entity
 @Table(name = "sms_users")
 public class Auth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(nullable = false, unique = true)
     private String username;
+    @Column(nullable = false)
     private String password;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     public Auth() {}
 
-    public Auth(String username, String password, String role) {
+    public Auth(String username, String password, Role role) {
         this.username = username;
         this.password = password;
         this.role = role;
@@ -44,11 +49,11 @@ public class Auth {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
