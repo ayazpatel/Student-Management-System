@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 public class MinioController {
@@ -18,16 +19,16 @@ public class MinioController {
 
     @PostMapping("/upload-and-get-url")
     public ResponseEntity<?> uploadFileAndGetUrl(@RequestParam("file") MultipartFile file) {
-        String objectName = file.getOriginalFilename();
-        String result = minioService.uploadAndGetPresignedUrl(file, objectName);
+        // Using the original filename is a security risk. Generate a unique one.
+        String objectName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+        minioService.uploadFile(file, objectName);
+        String url = minioService.getPresignedUrl(objectName);
 
-        // Check if the result is a URL (success) or an error message (failure)
-        if (result.startsWith("http")) {
-            // Success
-            return ResponseEntity.ok(Map.of("url", result));
+        // A null check is safer and cleaner than startsWith("http")
+        if (url != null) {
+            return ResponseEntity.ok(Map.of("url", url));
         } else {
-            // Failure
-            return ResponseEntity.status(500).body(Map.of("error", result));
+            return ResponseEntity.status(500).body(Map.of("error", "File uploaded but failed to generate URL."));
         }
     }
 }

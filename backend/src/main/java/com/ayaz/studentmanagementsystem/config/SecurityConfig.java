@@ -32,22 +32,17 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(authorize ->authorize
                 .requestMatchers(
                         "/auth/register",
-                        "/auth/login"
+                        "/auth/login",
+                        "/upload-and-get-url" // Assuming this is a public utility endpoint
                 ).permitAll()
-                .requestMatchers(
-//                        "/student/register",
-                        "/student/update/*",
-                        "/student/delete/*",
-                        "/student/view/*",
-                        "/student/view-all"
-                ).hasRole("TEACHER")
-                .requestMatchers(
-//                        "/student/register",
-                        "/student/view"
-                ).hasRole("STUDENT")
-                .requestMatchers(
-                        "/student/register"
-                ).hasAnyRole("STUDENT", "TEACHER")
+                // --- Student Endpoint Rules ---
+                // Specific rules for TEACHER role
+                .requestMatchers("/student/update/**", "/student/delete/**", "/student/view-all").hasRole("TEACHER")
+                // Rule for both roles to view a specific student
+                .requestMatchers("/student/view/**").hasAnyRole("STUDENT", "TEACHER")
+                // Rule for both roles to register
+                .requestMatchers("/student/register").hasAnyRole("STUDENT", "TEACHER")
+                // All other requests must be authenticated
                 .anyRequest().authenticated());
         httpSecurity.httpBasic(customizer -> customizer.disable());
         httpSecurity.formLogin(customizer -> customizer.disable());

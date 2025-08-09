@@ -3,6 +3,8 @@ package com.ayaz.studentmanagementsystem.model;
 import jakarta.persistence.*;
 
 import com.ayaz.studentmanagementsystem.model.enums.Role;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "sms_users")
@@ -10,11 +12,18 @@ public class Auth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @NotBlank(message = "Username cannot be blank")
     @Column(nullable = false, unique = true)
     private String username;
+
+    @NotBlank(message = "Password cannot be blank")
     @Column(nullable = false)
     private String password;
+
+    @NotNull(message = "Role must be specified")
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     public Auth() {}

@@ -1,19 +1,46 @@
 package com.ayaz.studentmanagementsystem.model;
 
+import com.ayaz.studentmanagementsystem.model.enums.Gender;
+
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "sms_student")
 public class Student {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @NotBlank(message = "Full name cannot be blank")
+    @Column(nullable = false)
     private String fullname;
+
+    @NotNull(message = "Age cannot be null")
+    @Min(value = 3, message = "Age must be greater than or equal to 3")
+    @Column(nullable = false)
     private Integer age;
-    private String gender;
+
+    @NotNull(message = "Gender must be specified")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
+
+    @NotBlank(message = "Course cannot be blank")
+    @Column(nullable = false)
     private String course;
+
+    @NotBlank(message = "Address cannot be blank")
+    @Column(nullable = false)
     private String address;
+
     private String image_object_name;
+
+    @Transient // This tells JPA to not map this field to a db column
     private String image_uri;
 
     public Student() {}
@@ -52,11 +79,11 @@ public class Student {
         this.age = age;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
